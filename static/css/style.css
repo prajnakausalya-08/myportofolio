@@ -290,3 +290,64 @@ h1,
         transform: translate(-5px, -5px);
         box-shadow: 8px 8px 0 var(--accent);
     }
+
+/* ========================================
+   EDUCATION
+   ======================================== */
+
+    .education {
+        padding: 4rem 0 5rem;
+        border-top: 1px solid var(--line);
+    }
+
+    .education h2 {
+        font-family: "Space Grotesk", -apple-system, sans-serif;
+        font-size: 2.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .education-card {
+        padding: 2rem;
+        background-color: var(--accent);
+        border-radius: var(--radius);
+        color: var(--paper);
+
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .education-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .education-header h3 {
+        font-family: "Space Grotesk", -apple-system, sans-serif;
+        font-size: 1.5rem;
+    }
+
+    .education-header span {
+        font-weight: 700;
+    }
+
+    .education-details {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2rem;
+    }
+
+    .education-item h4 {
+        font-family: "Space Grotesk", -apple-system, sans-serif;
+        margin-bottom: 0.4rem;
+    }
+
+    .education-item p {
+        color: var(--paper);
+    }
+
+    .education-card:hover {
+        transform: translate(-5px, -5px);
+        box-shadow: 8px 8px 0 var(--accent-dark);
+    }
