@@ -322,7 +322,6 @@ h1,
         box-shadow: 8px 8px 0 var(--accent-dark);
     }
 
-
 /* ========================================
    RESPONSIVE
    ======================================== */
@@ -348,7 +347,17 @@ h1,
         grid-template-columns: 1fr;
     }
 
-    .hobbies h2 {
+    .education-details {
+        grid-template-columns: 1fr;
+    }
+
+    .education-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .hobbies h2,
+    .education h2 {
         font-size: 2rem;
     }
 }
