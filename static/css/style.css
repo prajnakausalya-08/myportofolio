@@ -203,36 +203,6 @@ h1,
 
 
 /* ========================================
-   RESPONSIVE
-   ======================================== */
-
-@media (max-width: 600px) {
-    .hero-grid {
-        grid-template-columns: 1fr;
-        grid-template-areas:
-            "identity"
-            "photo"
-            "details";
-    }
-
-    .hero-photo {
-        max-width: 220px;
-    }
-
-    .social-links {
-        justify-content: flex-start;
-    }
-
-    .hobbies-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .hobbies h2 {
-        font-size: 2rem;
-    }
-}
-
-/* ========================================
    HOBBIES
    ======================================== */
 
@@ -351,3 +321,34 @@ h1,
         transform: translate(-5px, -5px);
         box-shadow: 8px 8px 0 var(--accent-dark);
     }
+
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 600px) {
+    .hero-grid {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "identity"
+            "photo"
+            "details";
+    }
+
+    .hero-photo {
+        max-width: 220px;
+    }
+
+    .social-links {
+        justify-content: flex-start;
+    }
+
+    .hobbies-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .hobbies h2 {
+        font-size: 2rem;
+    }
+}
