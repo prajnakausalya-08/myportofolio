@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Prajna - Portfolio</title>
+    <title>{{ name }} - Portofolio</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,10 +22,11 @@
 
     <header class="site-header">
         <div class="container">
-            <a href="#profile" class="brand">Prajna Kausalya Damdami</a>
+            <a href="{% url 'main:show_main' %}" class="brand">{{ name }}</a>
 
             <nav>
-                <a href="#profile">Profile</a>
+                <a href="{% url 'main:show_main' %}">Profile</a>
+                <a href="{% url 'main:show_experience' %}">Experience</a>
             </nav>
         </div>
     </header>
@@ -40,35 +41,29 @@
                         Computer Science &middot; Universitas Indonesia
                     </p>
 
-                    <h1>Prajna Kausalya Damdami</h1>
+                    <h1>{{ name }}</h1>
                 </div>
 
                 <div class="hero-photo">
                     <div class="photo-block"></div>
 
-                    <img
-                        class="avatar"
-                        src="/static/img/burhan.png"
-                        alt="Photo of Burhan"
-                    >
+                    <img class="avatar" src="/static/img/burhan.png" alt="Photo of {{ name }}">
                 </div>
 
                 <div class="hero-details">
 
-                    <p class="bio">
-                        A Computer Science Student who deeply interested in technology, programming, design, and arts with high creativity. Lately focused on studying in CS Universitas Indonesia.
-                    </p>
+                    <p class="bio">{{ bio }}</p>
 
                     <dl class="meta-list">
 
                         <div class="meta-row">
                             <dt>NPM</dt>
-                            <dd>2506657213</dd>
+                            <dd>{{ npm }}</dd>
                         </div>
 
                         <div class="meta-row">
                             <dt>Program</dt>
-                            <dd>S1 Ilmu Komputer</dd>
+                            <dd>{{ study_program }}</dd>
                         </div>
 
                     </dl>
@@ -180,10 +175,7 @@
 
     <footer class="site-footer">
         <div class="container">
-            <p>
-                &copy; 2026 Prajna Kausalya Damdami. Fakultas Ilmu Komputer,
-                Universitas Indonesia.
-            </p>
+            <p>&copy; 2026 {{ name }}. Fakultas Ilmu Komputer, Universitas Indonesia.</p>
         </div>
     </footer>
 
