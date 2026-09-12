@@ -1,7 +1,6 @@
 import uuid
 from django.db import models
 
-
 class Experience(models.Model):
     EXPERIENCE_CHOICES = [
         ('internship', 'Internship'),
@@ -34,3 +33,13 @@ class Experience(models.Model):
     @property
     def is_ongoing(self):
         return self.ended_at is None
+
+class Education(models.Model):
+    school = models.CharField(max_length=255)
+    start_year = models.IntegerField()
+    end_year = models.IntegerField()
+    curriculum = models.CharField(max_length=255)
+    supporting_subjects = models.TextField()
+
+    def __str__(self):
+        return self.school
