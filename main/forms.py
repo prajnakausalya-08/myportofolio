@@ -22,23 +22,23 @@ class EducationForm(ModelForm):
         widgets = {
             "school": TextInput(
                 attrs={
-                    "placeholder": "SMA Negeri 82 Jakarta",
+                    "placeholder": "Nama institusi",
                     "maxlength": 255,
                 }
             ),
             "start_year": NumberInput(
                 attrs={
-                    "placeholder": "2022",
+                    "placeholder": "Masukkan tahun mulai",
                 }
             ),
             "end_year": NumberInput(
                 attrs={
-                    "placeholder": "2025",
+                    "placeholder": "Masukkan tahun selesai",
                 }
             ),
             "curriculum": TextInput(
                 attrs={
-                    "placeholder": "Merdeka Curriculum",
+                    "placeholder": "Jenis kurikulum",
                     "maxlength": 255,
                 }
             ),
