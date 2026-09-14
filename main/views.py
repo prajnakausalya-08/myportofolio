@@ -1,4 +1,6 @@
 from django.contrib import messages
+from django.core import serializers
+from django.http import HttpResponse
 from django.shortcuts import redirect, render
 
 from main.forms import EducationForm
@@ -49,3 +51,11 @@ def create_education(request):
     }
 
     return render(request, "education_form.html", context)
+
+def get_education_json(request):
+    educations = Education.objects.all()
+    education_json = serializers.serialize("json", educations)
+    return HttpResponse(
+        education_json,
+        content_type="application/json",
+    )
