@@ -39,7 +39,7 @@ class Education(models.Model):
     start_year = models.IntegerField()
     end_year = models.IntegerField()
     curriculum = models.CharField(max_length=255)
-    supporting_subjects = models.TextField()
+    description = models.TextField()
 
     def __str__(self):
         return self.school

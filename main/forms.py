@@ -10,14 +10,14 @@ class EducationForm(ModelForm):
             "start_year",
             "end_year",
             "curriculum",
-            "supporting_subjects",
+            "description",
         ]
         labels = {
             "school": "Nama Sekolah",
             "start_year": "Tahun Mulai",
             "end_year": "Tahun Selesai",
             "curriculum": "Kurikulum",
-            "supporting_subjects": "Mata Pelajaran Pendukung",
+            "description": "Deskripsi",
         }
         widgets = {
             "school": TextInput(
@@ -42,9 +42,9 @@ class EducationForm(ModelForm):
                     "maxlength": 255,
                 }
             ),
-            "supporting_subjects": Textarea(
+            "description": Textarea(
                 attrs={
-                    "placeholder": "Advanced Mathematics, Physics, Chemistry, and Biology",
+                    "placeholder": "Deskripsikan pendidikanmu",
                     "rows": 3,
                 }
             ),

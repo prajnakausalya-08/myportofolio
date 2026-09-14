@@ -67,7 +67,7 @@ class EducationTest(TestCase):
             start_year=2022,
             end_year=2025,
             curriculum="Merdeka Curriculum",
-            supporting_subjects="Advanced Mathematics, Physics, Chemistry, and Biology",
+            description="Student at SMA Negeri 82 Jakarta.",
         )
 
     def test_education_url_is_accessible(self):
@@ -82,7 +82,7 @@ class EducationTest(TestCase):
         self.assertContains(response, str(self.education.start_year))
         self.assertContains(response, str(self.education.end_year))
         self.assertContains(response, self.education.curriculum)
-        self.assertContains(response, self.education.supporting_subjects)
+        self.assertContains(response, self.education.description)
 
     def test_empty_education_page(self):
         Education.objects.all().delete()
