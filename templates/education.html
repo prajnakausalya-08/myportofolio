@@ -42,6 +42,8 @@
                         {{ education.description }}
                     </p>
 
+                    {% include "components/education_delete_modal.html" with education=education %}
+
                 </article>
 
                 {% empty %}
