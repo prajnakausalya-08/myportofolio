@@ -93,3 +93,46 @@ class EducationTest(TestCase):
             response,
             "No education history has been added yet."
         )
+
+    def test_education_json_endpoint(self):
+        response = self.client.get(reverse("main:get_education_json"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "application/json")
+
+        self.assertContains(response, self.education.school)
+        self.assertContains(response, self.education.curriculum)
+        self.assertContains(response, self.education.description)
+
+    def test_delete_education(self):
+        response = self.client.post(
+            reverse(
+                "main:delete_education",
+                kwargs={"education_id": self.education.id},
+            )
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(
+            Education.objects.filter(id=self.education.id).exists()
+        )
+
+    def test_create_education(self):
+        response = self.client.post(
+            reverse("main:create_education"),
+            {
+                "school": "Universitas Indonesia",
+                "start_year": 2025,
+                "end_year": 2029,
+                "curriculum": "Kurikulum Pendidikan Tinggi",
+                "description": "Computer Science student.",
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+
+        self.assertTrue(
+            Education.objects.filter(
+                school="Universitas Indonesia"
+            ).exists()
+        )
