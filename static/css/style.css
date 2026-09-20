@@ -623,3 +623,21 @@ h1,
         text-align: center;
     }
 }
+
+.education-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    align-items: center;
+}
+
+.education-actions .experience-status {
+    margin-top: 0;
+}
+
+.education-actions .button {
+    height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}

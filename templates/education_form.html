@@ -9,11 +9,15 @@
 <main>
     <section class="experience-section">
         <div class="container">
-            <h1>Add New Education</h1>
+            {% if education %}
+                <h1>Edit Education</h1>
+            {% else %}
+                <h1>Add New Education</h1>
+            {% endif %}
 
             <form method="post"
-                  action="{% url 'main:create_education' %}"
-                  class="project-form">
+                action="{% if education %}{% url 'main:edit_education' education.id %}{% else %}{% url 'main:create_education' %}{% endif %}"
+                class="project-form">
 
                 {% csrf_token %}
 
@@ -32,7 +36,11 @@
                 {% endfor %}
 
                 <button type="submit" class="button">
-                    Tambah Education
+                    {% if education %}
+                        Simpan Perubahan
+                    {% else %}
+                        Tambah Education
+                    {% endif %}
                 </button>
 
                 <a href="{% url 'main:show_education' %}"

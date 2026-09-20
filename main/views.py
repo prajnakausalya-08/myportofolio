@@ -62,6 +62,24 @@ def create_education(request):
 
     return render(request, "education_form.html", context)
 
+def edit_education(request, education_id):
+    education = get_object_or_404(Education, pk=education_id)
+
+    form = EducationForm(request.POST or None, instance=education)
+
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Education berhasil diperbarui!")
+        return redirect("main:show_education")
+
+    context = {
+        "name": "Prajna Kausalya Damdami",
+        "form": form,
+        "education": education,
+    }
+
+    return render(request, "education_form.html", context)
+
 def get_education_json(request):
     educations = Education.objects.all()
     education_json = serializers.serialize("json", educations)
