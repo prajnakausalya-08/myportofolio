@@ -1,3 +1,7 @@
+import datetime
+
+from django.contrib.auth import login, logout
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib import messages
 from django.core import serializers
 from django.http import HttpResponse
@@ -8,6 +12,11 @@ from main.models import Experience, Education
 
 
 def show_main(request):
+    last_login = request.COOKIES.get(
+        "last_login",
+        "Belum ada sesi login / Cookie tidak ditemukan"
+    )
+
     context = {
         "name": "Prajna Kausalya Damdami",
         "npm": "2506657213",
@@ -17,9 +26,55 @@ def show_main(request):
             "technology, programming, design, and arts with high creativity. "
             "Lately focused on studying in CS Universitas Indonesia."
         ),
+        "last_login": last_login,
     }
 
     return render(request, "index.html", context)
+
+def register(request):
+    form = UserCreationForm(request.POST or None)
+
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Akun berhasil dibuat. Silakan login.")
+        return redirect("main:login")
+
+    context = {
+        "name": "Prajna Kausalya Damdami",
+        "form": form,
+    }
+
+    return render(request, "register.html", context)
+
+def login_user(request):
+    form = AuthenticationForm(request, data=request.POST or None)
+
+    if request.method == "POST" and form.is_valid():
+        user = form.get_user()
+        login(request, user)
+
+        response = redirect("main:show_main")
+        response.set_cookie(
+            "last_login",
+            datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        )
+
+        return response
+
+    context = {
+        "name": "Prajna Kausalya Damdami",
+        "form": form,
+    }
+
+    return render(request, "login.html", context)
+
+def logout_user(request):
+    logout(request)
+
+    response = redirect("main:show_main")
+    response.delete_cookie("last_login")
+
+    return response
 
 
 def show_experience(request):
