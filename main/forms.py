@@ -1,5 +1,14 @@
-from django.forms import ModelForm, TextInput, NumberInput, Textarea
-from main.models import Education
+from django.forms import (
+    ModelForm,
+    TextInput,
+    NumberInput,
+    Textarea,
+    Select,
+    URLInput,
+    DateTimeInput,
+)
+
+from main.models import Education, Experience
 
 
 class EducationForm(ModelForm):
@@ -46,6 +55,47 @@ class EducationForm(ModelForm):
                 attrs={
                     "placeholder": "Deskripsikan pendidikanmu",
                     "rows": 3,
+                }
+            ),
+        }
+
+class ExperienceForm(ModelForm):
+    class Meta:
+        model = Experience
+        fields = [
+            "title",
+            "description",
+            "category",
+            "thumbnail",
+            "ended_at",
+        ]
+
+        widgets = {
+            "title": TextInput(
+                attrs={
+                    "placeholder": "Judul pengalaman",
+                    "maxlength": 255,
+                }
+            ),
+            "description": Textarea(
+                attrs={
+                    "placeholder": "Deskripsikan pengalamanmu",
+                    "rows": 4,
+                }
+            ),
+            "category": Select(
+                attrs={
+                    "class": "form-select",
+                }
+            ),
+            "thumbnail": URLInput(
+                attrs={
+                    "placeholder": "https://example.com/image.jpg",
+                }
+            ),
+            "ended_at": DateTimeInput(
+                attrs={
+                    "type": "datetime-local",
                 }
             ),
         }
