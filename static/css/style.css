@@ -641,3 +641,50 @@ h1,
     align-items: center;
     justify-content: center;
 }
+
+/* Experience layout */
+.experience-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: auto;
+    padding-top: 1.5rem;
+    align-items: center;
+}
+
+.experience-actions .button {
+    flex: 0 0 auto;
+    height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.experience-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.experience-header h1 {
+    margin-bottom: 0;
+}
+
+.experience-header .section-kicker {
+    margin-bottom: 0.5rem;
+}
+
+.experience-grid {
+    align-items: stretch;
+}
+
+.experience-card {
+    display: flex;
+    flex-direction: column;
+}
+
+.experience-card .experience-actions {
+    margin-top: auto;
+    padding-top: 1.5rem;
+}
