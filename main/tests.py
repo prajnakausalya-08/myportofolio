@@ -60,6 +60,71 @@ class MainTest(TestCase):
         self.assertContains(response, "Completed")
         self.assertNotContains(response, "Ongoing")
 
+    def test_create_experience(self):
+        response = self.client.post(
+            reverse("main:create_experience"),
+            {
+                "title": "Software Engineer Intern",
+                "description": "Worked on web development.",
+                "category": "internship",
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(
+            Experience.objects.filter(
+                title="Software Engineer Intern"
+            ).exists()
+        )
+
+    def test_edit_experience(self):
+        response = self.client.post(
+            reverse(
+                "main:edit_experience",
+                kwargs={"experience_id": self.experience.id},
+            ),
+            {
+                "title": "Updated Experience",
+                "description": "Updated description.",
+                "category": "research",
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+
+        self.experience.refresh_from_db()
+
+        self.assertEqual(
+            self.experience.title,
+            "Updated Experience"
+        )
+        self.assertEqual(
+            self.experience.description,
+            "Updated description."
+        )
+        self.assertEqual(
+            self.experience.category,
+            "research"
+        )
+
+    def test_delete_experience(self):
+        experience_id = self.experience.id
+
+        response = self.client.post(
+            reverse(
+                "main:delete_experience",
+                kwargs={"experience_id": experience_id},
+            )
+        )
+
+        self.assertEqual(response.status_code, 302)
+
+        self.assertFalse(
+            Experience.objects.filter(
+                id=experience_id
+            ).exists()
+        )
+
 class EducationTest(TestCase):
     def setUp(self):
         self.education = Education.objects.create(
@@ -135,4 +200,40 @@ class EducationTest(TestCase):
             Education.objects.filter(
                 school="Universitas Indonesia"
             ).exists()
+        )
+
+    def test_edit_education(self):
+        response = self.client.post(
+            reverse(
+                "main:edit_education",
+                kwargs={"education_id": self.education.id},
+            ),
+            {
+                "school": "Universitas Indonesia",
+                "start_year": 2025,
+                "end_year": 2029,
+                "curriculum": "Kurikulum Pendidikan Tinggi",
+                "description": "Computer Science student.",
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+
+        self.education.refresh_from_db()
+
+        self.assertEqual(
+            self.education.school,
+            "Universitas Indonesia"
+        )
+        self.assertEqual(
+            self.education.start_year,
+            2025
+        )
+        self.assertEqual(
+            self.education.end_year,
+            2029
+        )
+        self.assertEqual(
+            self.education.description,
+            "Computer Science student."
         )
