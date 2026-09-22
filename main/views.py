@@ -227,7 +227,6 @@ def delete_experience(request, experience_id):
 
 def get_experience_json(request):
     experiences = Experience.objects.all()
-    experience_json = serializers.serialize("json", experiences)
     experience_json = serializers.serialize(
         "json",
         experiences,
