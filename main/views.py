@@ -1,5 +1,7 @@
 import datetime
 
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
 from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib import messages
@@ -165,7 +167,10 @@ def delete_education(request, education_id):
 
     return redirect("main:show_education")
 
+@login_required(login_url="/login/")
 def create_experience(request):
+    if not request.user.is_superuser:
+        raise PermissionDenied
     form = ExperienceForm(request.POST or None)
 
     if request.method == "POST" and form.is_valid():
@@ -180,7 +185,10 @@ def create_experience(request):
 
     return render(request, "experience_form.html", context)
 
+@login_required(login_url="/login/")
 def edit_experience(request, experience_id):
+    if not request.user.is_superuser:
+        raise PermissionDenied
     experience = get_object_or_404(Experience, pk=experience_id)
 
     form = ExperienceForm(
@@ -201,7 +209,10 @@ def edit_experience(request, experience_id):
 
     return render(request, "experience_form.html", context)
 
+@login_required(login_url="/login/")
 def delete_experience(request, experience_id):
+    if not request.user.is_superuser:
+        raise PermissionDenied
     experience = get_object_or_404(
         Experience,
         pk=experience_id,
@@ -217,6 +228,11 @@ def delete_experience(request, experience_id):
 def get_experience_json(request):
     experiences = Experience.objects.all()
     experience_json = serializers.serialize("json", experiences)
+    experience_json = serializers.serialize(
+        "json",
+        experiences,
+        use_natural_foreign_keys=True,
+    )
 
     return HttpResponse(
         experience_json,
