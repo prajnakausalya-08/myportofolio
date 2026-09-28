@@ -400,6 +400,22 @@ h1,
     text-transform: uppercase;
 }
 
+.form-group select {
+    width: 100%;
+    padding: 0.7rem;
+    border: 1px solid var(--accent);
+    border-radius: var(--radius);
+    background: white;
+    font: inherit;
+    color: var(--ink);
+    box-sizing: border-box;
+}
+
+.form-group select:focus {
+    outline: 2px solid var(--accent);
+    border-color: var(--accent);
+}
+
 .experience-card h2 {
     margin: 0.5rem 0;
     font-size: 1.25rem;
