@@ -47,12 +47,16 @@
 
                         {% include "components/experience_star.html" with experience=experience %}
 
-                        {% if user.is_superuser %}
+                        {% if user.is_superuser or is_editor %}
 
                         <a href="{% url 'main:edit_experience' experience.id %}"
                         class="button">
                             Edit
                         </a>
+
+                        {% endif %}
+
+                        {% if user.is_superuser %}
 
                         <button type="button"
                                 class="button button-danger"
