@@ -115,16 +115,29 @@ def show_education(request):
         json_response.content.decode("utf-8"),
     )
 
-    educations = [education.object for education in educations]
+    educations = [
+        education.object
+        for education in educations
+    ]
+
+    is_editor = (
+        request.user.is_authenticated
+        and request.user.groups.filter(name="Editor").exists()
+    )
 
     context = {
         "name": "Prajna Kausalya Damdami",
         "education_list": educations,
+        "is_editor": is_editor,
     }
 
     return render(request, "education.html", context)
 
+@login_required(login_url="/login/")
 def create_education(request):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+
     form = EducationForm(request.POST or None)
 
     if request.method == "POST" and form.is_valid():
@@ -139,10 +152,22 @@ def create_education(request):
 
     return render(request, "education_form.html", context)
 
+@login_required(login_url="/login/")
 def edit_education(request, education_id):
-    education = get_object_or_404(Education, pk=education_id)
+    is_editor = request.user.groups.filter(name="Editor").exists()
 
-    form = EducationForm(request.POST or None, instance=education)
+    if not request.user.is_superuser and not is_editor:
+        raise PermissionDenied
+
+    education = get_object_or_404(
+        Education,
+        pk=education_id,
+    )
+
+    form = EducationForm(
+        request.POST or None,
+        instance=education,
+    )
 
     if request.method == "POST" and form.is_valid():
         form.save()
@@ -165,8 +190,15 @@ def get_education_json(request):
         content_type="application/json",
     )
 
+@login_required(login_url="/login/")
 def delete_education(request, education_id):
-    education = get_object_or_404(Education, pk=education_id)
+    if not request.user.is_superuser:
+        raise PermissionDenied
+
+    education = get_object_or_404(
+        Education,
+        pk=education_id,
+    )
 
     if request.method == "POST":
         education.delete()
