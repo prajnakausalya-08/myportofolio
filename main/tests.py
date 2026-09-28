@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
+from django.contrib.auth.models import User
 from main.models import Experience, Education
 
 
@@ -62,6 +63,11 @@ class MainTest(TestCase):
 
 class EducationTest(TestCase):
     def setUp(self):
+        self.superuser = User.objects.create_superuser(
+            username="testsuperuser",
+            password="testpassword123",
+        )
+
         self.education = Education.objects.create(
             school="SMA Negeri 82 Jakarta",
             start_year=2022,
@@ -105,6 +111,11 @@ class EducationTest(TestCase):
         self.assertContains(response, self.education.description)
 
     def test_delete_education(self):
+        self.client.login(
+            username="testsuperuser",
+            password="testpassword123",
+        )
+
         response = self.client.post(
             reverse(
                 "main:delete_education",
@@ -118,6 +129,11 @@ class EducationTest(TestCase):
         )
 
     def test_create_education(self):
+        self.client.login(
+            username="testsuperuser",
+            password="testpassword123",
+        )
+        
         response = self.client.post(
             reverse("main:create_education"),
             {
