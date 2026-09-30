@@ -6,8 +6,9 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib import messages
 from django.core import serializers
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_POST
 
 from main.forms import EducationForm, ExperienceForm
 from main.models import Experience, Education
@@ -82,27 +83,12 @@ def logout_user(request):
 
 
 def show_experience(request):
-    json_response = get_experience_json(request)
-
-    experiences = serializers.deserialize(
-        "json",
-        json_response.content.decode("utf-8"),
-    )
-
-    experiences = [
-        experience.object
-        for experience in experiences
-    ]
-
-    is_editor = (
-        request.user.is_authenticated
-        and request.user.groups.filter(name="Editor").exists()
-    )
+    title_query = request.GET.get("title", "").strip()
 
     context = {
         "name": "Prajna Kausalya Damdami",
-        "experience_list": experiences,
-        "is_editor": is_editor,
+        "title_query": title_query,
+        "form": ExperienceForm(),
     }
 
     return render(request, "experience.html", context)
@@ -125,10 +111,13 @@ def show_education(request):
         and request.user.groups.filter(name="Editor").exists()
     )
 
+    school_query = request.GET.get("school", "").strip()
+
     context = {
         "name": "Prajna Kausalya Damdami",
         "education_list": educations,
         "is_editor": is_editor,
+        "school_query": school_query,
     }
 
     return render(request, "education.html", context)
@@ -183,8 +172,20 @@ def edit_education(request, education_id):
     return render(request, "education_form.html", context)
 
 def get_education_json(request):
+    school_query = request.GET.get("school", "").strip()
+
     educations = Education.objects.all()
-    education_json = serializers.serialize("json", educations)
+
+    if school_query:
+        educations = educations.filter(
+            school__icontains=school_query
+        )
+
+    education_json = serializers.serialize(
+        "json",
+        educations
+    )
+
     return HttpResponse(
         education_json,
         content_type="application/json",
@@ -224,6 +225,36 @@ def create_experience(request):
     }
 
     return render(request, "experience_form.html", context)
+
+@require_POST
+def create_experience_ajax(request):
+    if not request.user.is_superuser:
+        return JsonResponse(
+            {
+                "message": "Hanya pemilik portofolio yang dapat menambahkan experience."
+            },
+            status=403,
+        )
+
+    form = ExperienceForm(request.POST)
+
+    if form.is_valid():
+        experience = form.save()
+
+        return JsonResponse(
+            {
+                "message": "Experience berhasil ditambahkan.",
+                "pk": str(experience.id),
+            },
+            status=201,
+        )
+
+    return JsonResponse(
+        {
+            "errors": form.errors.get_json_data()
+        },
+        status=400,
+    )
 
 @login_required(login_url="/login/")
 def edit_experience(request, experience_id):
@@ -272,17 +303,62 @@ def delete_experience(request, experience_id):
     return redirect("main:show_experience")
 
 def get_experience_json(request):
-    experiences = Experience.objects.all()
-    experience_json = serializers.serialize(
-        "json",
-        experiences,
-        use_natural_foreign_keys=True,
+    title_query = request.GET.get("title", "").strip()
+
+    experiences = Experience.objects.prefetch_related(
+        "starred_by"
+    ).all()
+
+    if title_query:
+        experiences = experiences.filter(
+            title__icontains=title_query
+        )
+
+    is_editor = (
+        request.user.is_authenticated
+        and request.user.groups.filter(name="Editor").exists()
     )
 
-    return HttpResponse(
-        experience_json,
-        content_type="application/json",
+    is_superuser = (
+        request.user.is_authenticated
+        and request.user.is_superuser
     )
+
+    data = []
+
+    for experience in experiences:
+        starred_users = experience.starred_by.all()
+
+        is_starred = (
+            request.user in starred_users
+            if request.user.is_authenticated
+            else False
+        )
+
+        starred_by_names = ", ".join(
+            [user.username for user in starred_users]
+        )
+
+        data.append({
+            "pk": str(experience.id),
+            "fields": {
+                "title": experience.title,
+                "description": experience.description,
+                "category": experience.category,
+                "thumbnail": experience.thumbnail,
+                "started_at": experience.started_at,
+                "ended_at": experience.ended_at,
+                "is_ongoing": experience.is_ongoing,
+                "star_count": starred_users.count(),
+                "is_starred": is_starred,
+                "starred_by_names": starred_by_names,
+                "is_authenticated": request.user.is_authenticated,
+                "is_editor": is_editor,
+                "is_superuser": is_superuser,
+            }
+        })
+
+    return JsonResponse(data, safe=False)
 
 @login_required(login_url="/login/")
 def toggle_star(request, experience_id):
