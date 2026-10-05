@@ -97,3 +97,30 @@ Beberapa contoh prompt yang saya gunakan selama mengerjakan Tugas 4:
 "Tolong bantu cari penyebab error dari kode ini dan jelaskan langkah memperbaikinya."
 
 Saya lebih sering menggunakan AI untuk memahami konsep, mencari penyebab error, dan mengecek kode, bukan hanya untuk meminta kode jadi. Setelah mendapat penjelasan dari AI, saya tetap mencoba menjalankan dan memahami kodenya sendiri. Menurut saya, salah satu kekurangan AI selama pengerjaan adalah jawabannya tidak selalu langsung cocok dengan project saya. Karena struktur model, URL, template, dan CSS yang saya punya berbeda, beberapa kode dari AI perlu saya ubah lagi. Jadi saya tetap harus mengecek hasilnya sendiri dan menyesuaikan dengan project yang sedang saya kerjakan. Setelah semuanya selesai, saya melakukan testing lewat browser dan menjalankan automated test untuk memastikan fitur yang saya tambahkan berjalan dan fitur sebelumnya tetap aman.
+
+### Tugas 5
+
+1. Debouncing itu teknik buat nunda pemanggilan fungsi sampai user berhenti ngetik selama beberapa waktu. Menurut saya ini penting di pencarian AJAX karena kalau nggak pakai debouncing, setiap kali kita ngetik satu huruf bakal langsung ngirim request ke server. Misalnya kita mau cari "universitas", berarti bisa ada banyak request yang dikirim cuma karena kita ngetik satu-satu. Dengan debouncing, request baru dikirim setelah user berhenti ngetik beberapa saat, jadi request yang dikirim juga lebih sedikit dan pencariannya lebih efisien.
+
+2. `await` digunakan supaya program menunggu proses yang ada di `fetch()` selesai sebelum lanjut ke bagian berikutnya. Jadi misalnya kita pakai `await fetch()`, program akan menunggu sampai response dari server diterima dulu. Setelah itu baru response tersebut bisa diproses lagi menggunakan `response.json()`. Kalau nggak pakai `await`, hasil dari `fetch()` masih berupa Promise, jadi kode berikutnya bisa aja jalan duluan padahal datanya belum selesai diterima. Akibatnya data yang mau dipakai belum tersedia.
+
+3. XSS atau Cross-Site Scripting adalah serangan dimana seseorang memasukkan HTML atau JavaScript yang berbahaya ke dalam data yang nantinya ditampilkan di website. Hal ini perlu diperhatikan ketika menggunakan AJAX/JavaScript karena data dari server bisa kita masukkan langsung ke HTML. Kalau langsung pakai `innerHTML` tanpa melakukan escape, browser bisa menganggap isi tersebut sebagai HTML atau script dan menjalankannya. Sedangkan kalau menggunakan template Django, data yang ditampilkan biasanya sudah di-auto escape oleh Django. Karena itu di Tugas 5 saya melakukan escape pada data yang ditampilkan lewat JavaScript dan juga menggunakan `strip_tags` pada `EducationForm` supaya input yang masuk tidak mengandung tag HTML.
+
+### AI Disclosure Tugas 5
+
+Saya menggunakan ChatGPT sebagai alat bantu selama mengerjakan Tugas 5. Biasanya saya menggunakan AI kalau lagi bingung sama requirement tugas, nggak ngerti konsep tertentu, atau pas kode yang saya buat error dan saya nggak tau salahnya dimana.
+
+Di Tugas 5 ini saya beberapa kali menggunakan ChatGPT untuk memahami cara kerja AJAX dan Fetch API, terutama bagian mengambil data JSON, mengirim form menggunakan `fetch()`, membuat toast, debouncing untuk search, dan cara supaya data yang ditampilkan dari JavaScript aman dari XSS. Saya juga memberikan beberapa bagian kode project saya ke AI dan meminta dijelasin bagian tersebut secara bertahap karena saya lebih gampang ngerti kalau dijelasin dari kode yang saya punya sendiri.
+
+Contoh prompt yang saya gunakan misalnya seperti:
+
+- "jelasin ini secara bertahap karena aku masih bingung cara kerja fetch nya"
+- "kenapa search ajax harus pakai debounce?"
+- "tolong cek kode ini apakah udah sesuai requirement tugas 5"
+- "kenapa disini harus pakai await?"
+- "kalau data ini dimasukin ke innerHTML aman ga dari XSS?"
+- "tolong cari tau kenapa kode ini error tapi jelasin juga kenapa errornya"
+
+Saya nggak langsung menggunakan semua kode atau saran yang diberikan AI. Beberapa bagian harus saya ubah lagi karena struktur project saya beda dengan contoh yang dijelaskan di tutorial. Saya juga beberapa kali mencoba kodenya langsung di browser untuk lihat apakah hasilnya sesuai atau malah ada bagian yang rusak. Untuk fitur Education saya juga melakukan pengecekan dengan beberapa role yang berbeda supaya authorization yang sudah dibuat di tugas sebelumnya tetap berjalan.
+
+Menurut saya AI cukup membantu terutama kalau saya lagi stuck dan nggak tau harus mulai dari mana. Tapi AI juga nggak selalu langsung memberikan jawaban yang cocok dengan project saya. Ada beberapa kode yang harus disesuaikan lagi, terutama karena nama URL, template, model, dan struktur project saya sendiri. Jadi setelah mendapat bantuan dari AI saya tetap harus coba sendiri, baca lagi kodenya, dan testing sampai hasilnya sesuai.
