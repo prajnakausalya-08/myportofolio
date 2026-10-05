@@ -48,5 +48,11 @@ class Education(models.Model):
     curriculum = models.CharField(max_length=255)
     description = models.TextField()
 
+    starred_by = models.ManyToManyField(
+        User,
+        related_name="starred_educations",
+        blank=True,
+    )
+
     def __str__(self):
         return self.school
