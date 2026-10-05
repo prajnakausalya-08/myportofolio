@@ -94,33 +94,44 @@ def show_experience(request):
     return render(request, "experience.html", context)
 
 def show_education(request):
-    json_response = get_education_json(request)
-
-    educations = serializers.deserialize(
-        "json",
-        json_response.content.decode("utf-8"),
-    )
-
-    educations = [
-        education.object
-        for education in educations
-    ]
-
-    is_editor = (
-        request.user.is_authenticated
-        and request.user.groups.filter(name="Editor").exists()
-    )
-
-    school_query = request.GET.get("school", "").strip()
-
     context = {
         "name": "Prajna Kausalya Damdami",
-        "education_list": educations,
-        "is_editor": is_editor,
-        "school_query": school_query,
+        "form": EducationForm(),
     }
 
     return render(request, "education.html", context)
+
+
+@require_POST
+def create_education_ajax(request):
+    """Create an education entry from the Education page's AJAX modal."""
+    if not request.user.is_superuser:
+        return JsonResponse(
+            {
+                "message": (
+                    "Hanya pemilik portofolio yang dapat menambahkan education."
+                )
+            },
+            status=403,
+        )
+
+    form = EducationForm(request.POST)
+
+    if form.is_valid():
+        education = form.save()
+
+        return JsonResponse(
+            {
+                "message": "Education berhasil ditambahkan.",
+                "pk": education.pk,
+            },
+            status=201,
+        )
+
+    return JsonResponse(
+        {"errors": form.errors.get_json_data()},
+        status=400,
+    )
 
 @login_required(login_url="/login/")
 def create_education(request):
@@ -174,22 +185,79 @@ def edit_education(request, education_id):
 def get_education_json(request):
     school_query = request.GET.get("school", "").strip()
 
-    educations = Education.objects.all()
+    educations = Education.objects.prefetch_related("starred_by").order_by(
+        "-end_year",
+        "-start_year",
+        "school",
+    )
 
     if school_query:
         educations = educations.filter(
             school__icontains=school_query
         )
 
-    education_json = serializers.serialize(
-        "json",
-        educations
+    is_editor = (
+        request.user.is_authenticated
+        and request.user.groups.filter(name="Editor").exists()
     )
 
-    return HttpResponse(
-        education_json,
-        content_type="application/json",
+    is_superuser = (
+        request.user.is_authenticated
+        and request.user.is_superuser
     )
+
+    data = []
+
+    for education in educations:
+        starred_users = education.starred_by.all()
+
+        is_starred = (
+            request.user in starred_users
+            if request.user.is_authenticated
+            else False
+        )
+
+        starred_by_names = ", ".join(
+            [user.username for user in starred_users]
+        )
+
+        data.append({
+            "pk": education.pk,
+            "fields": {
+                "school": education.school,
+                "start_year": education.start_year,
+                "end_year": education.end_year,
+                "curriculum": education.curriculum,
+                "description": education.description,
+                "star_count": starred_users.count(),
+                "is_starred": is_starred,
+                "starred_by_names": starred_by_names,
+                "is_authenticated": request.user.is_authenticated,
+                "is_editor": is_editor,
+                "is_superuser": is_superuser,
+            }
+        })
+
+    return JsonResponse(data, safe=False)
+
+@login_required(login_url="/login/")
+@require_POST
+def toggle_education_star(request, education_id):
+    education = get_object_or_404(
+        Education,
+        pk=education_id,
+    )
+
+    if request.user in education.starred_by.all():
+        education.starred_by.remove(request.user)
+    else:
+        education.starred_by.add(request.user)
+
+    return JsonResponse({
+        "message": "Star berhasil diperbarui.",
+        "is_starred": request.user in education.starred_by.all(),
+        "star_count": education.starred_by.count(),
+    })
 
 @login_required(login_url="/login/")
 def delete_education(request, education_id):
@@ -374,5 +442,4 @@ def toggle_star(request, experience_id):
             experience.starred_by.add(request.user)
 
     return redirect("main:show_experience")
-
 
