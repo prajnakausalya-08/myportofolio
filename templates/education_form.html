@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block meta %}
+<title>Add Education - {{ name }}</title>
+{% endblock meta %}
+
+{% block content %}
+
+<main>
+    <section class="experience-section">
+        <div class="container">
+            {% if education %}
+                <h1>Edit Education</h1>
+            {% else %}
+                <h1>Add New Education</h1>
+            {% endif %}
+
+            <form id="education-edit-form" method="post"
+                action="{% if education %}{% url 'main:edit_education' education.id %}{% else %}{% url 'main:create_education' %}{% endif %}"
+                class="project-form">
+
+                {% csrf_token %}
+                <p id="education-edit-error" class="form-error" role="alert" hidden></p>
+
+                {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">
+                        {{ field.label }}
+                    </label>
+
+                    {{ field }}
+
+                    {% for error in field.errors %}
+                    <p class="form-error">{{ error }}</p>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+
+                <button type="submit" class="button">
+                    {% if education %}
+                        Simpan Perubahan
+                    {% else %}
+                        Tambah Education
+                    {% endif %}
+                </button>
+
+                <a href="{% url 'main:show_education' %}"
+                   class="button button-secondary">
+                    Batal
+                </a>
+
+            </form>
+        </div>
+    </section>
+</main>
+
+{% if education %}
+<script>
+const editForm = document.getElementById("education-edit-form");
+const editError = document.getElementById("education-edit-error");
+editForm.addEventListener("submit", async event => {
+    event.preventDefault();
+    const button = editForm.querySelector('button[type="submit"]');
+    const formData = new FormData(editForm);
+    const payload = Object.fromEntries(["school", "start_year", "end_year", "curriculum", "description"]
+        .map(field => [field, formData.get(field)]));
+    button.disabled = true;
+    editError.hidden = true;
+    try {
+        const response = await fetch("{% url 'api:education-detail' education.id %}", {
+            method: "PATCH",
+            headers: {"Content-Type": "application/json", "Accept": "application/json",
+                      "X-CSRFToken": formData.get("csrfmiddlewaretoken")},
+            body: JSON.stringify(payload),
+        });
+        if (!response.ok) {
+            const result = await response.json().catch(() => ({}));
+            throw new Error(Object.entries(result).map(([field, messages]) =>
+                `${field}: ${Array.isArray(messages) ? messages.join(" ") : messages}`).join(" ") ||
+                `Gagal menyimpan (status ${response.status}).`);
+        }
+        window.location.assign("{% url 'main:show_education' %}");
+    } catch (error) {
+        editError.textContent = error.message || "Tidak dapat terhubung ke server.";
+        editError.hidden = false;
+        showToast("Gagal menyimpan", editError.textContent, "error");
+    } finally {
+        button.disabled = false;
+    }
+});
+</script>
+{% endif %}
+
+{% endblock content %}

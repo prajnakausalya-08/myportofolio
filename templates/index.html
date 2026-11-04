@@ -1,34 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% block meta %}
+<title>{{ name }} - Portofolio</title>
+{% endblock meta %}
 
-    <title>Prajna - Portfolio</title>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    <link
-        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap"
-        rel="stylesheet"
-    >
-
-    <link rel="stylesheet" href="/static/css/style.css">
-</head>
-
-<body>
-
-    <header class="site-header">
-        <div class="container">
-            <a href="#profile" class="brand">Prajna Kausalya Damdami</a>
-
-            <nav>
-                <a href="#profile">Profile</a>
-            </nav>
-        </div>
-    </header>
+{% block content %}
 
     <main>
         <section class="hero" id="profile">
@@ -40,35 +16,34 @@
                         Computer Science &middot; Universitas Indonesia
                     </p>
 
-                    <h1>Prajna Kausalya Damdami</h1>
+                    <h1>{{ name }}</h1>
                 </div>
 
                 <div class="hero-photo">
                     <div class="photo-block"></div>
 
-                    <img
-                        class="avatar"
-                        src="/static/img/burhan.png"
-                        alt="Photo of Burhan"
-                    >
+                    <img class="avatar" src="/static/img/burhan.png" alt="Photo of {{ name }}">
                 </div>
 
                 <div class="hero-details">
 
-                    <p class="bio">
-                        A Computer Science Student who deeply interested in technology, programming, design, and arts with high creativity. Lately focused on studying in CS Universitas Indonesia.
-                    </p>
+                    <p class="bio">{{ bio }}</p>
 
                     <dl class="meta-list">
 
                         <div class="meta-row">
                             <dt>NPM</dt>
-                            <dd>2506657213</dd>
+                            <dd>{{ npm }}</dd>
                         </div>
 
                         <div class="meta-row">
                             <dt>Program</dt>
-                            <dd>S1 Ilmu Komputer</dd>
+                            <dd>{{ study_program }}</dd>
+                        </div>
+
+                        <div class="meta-row">
+                            <dt>Sesi Terakhir Login</dt>
+                            <dd>{{ last_login }}</dd>
                         </div>
 
                     </dl>
@@ -102,41 +77,6 @@
 
             </div>
 
-        </section>
-
-        <section class="education" id="education">
-            <div class="container">
-
-                <p class="section-kicker">EDUCATION</p>
-                <h2>My Education</h2>
-
-                <div class="education-card">
-
-                    <div class="education-header">
-                        <h3>🎓 SMA Negeri 82 Jakarta</h3>
-                        <span>2022 - 2025</span>
-                    </div>
-
-                    <div class="education-details">
-
-                        <div class="education-item">
-                            <h4>Curriculum</h4>
-                            <p>Kurikulum Merdeka</p>
-                        </div>
-
-                        <div class="education-item">
-                            <h4>Supporting Subjects</h4>
-                            <p>
-                                Advanced Mathematics, Physics,
-                                Chemistry, and Biology
-                            </p>
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
         </section>
 
         <section class="hobbies" id="hobbies">
@@ -177,16 +117,5 @@
             </div>
         </section>
     </main>
-
-    <footer class="site-footer">
-        <div class="container">
-            <p>
-                &copy; 2026 Prajna Kausalya Damdami. Fakultas Ilmu Komputer,
-                Universitas Indonesia.
-            </p>
-        </div>
-    </footer>
-
-</body>
-
-</html>
+    
+    {% endblock content %}
