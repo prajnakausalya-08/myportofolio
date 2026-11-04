@@ -17,17 +17,20 @@ from dotenv import load_dotenv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-load_dotenv()
+load_dotenv(BASE_DIR / '.env')
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-m($7xlujboo@i0ew5fj_w-dafn145pjb1o#=d+2$u%k-3@+ia@'
+SECRET_KEY = os.environ.get('SECRET_KEY', '')
+if not SECRET_KEY:
+    raise RuntimeError('Set SECRET_KEY in the environment or a local .env file.')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+PRODUCTION = os.getenv('PRODUCTION', 'False').lower() == 'true'
+DEBUG = not PRODUCTION
 
 ALLOWED_HOSTS = [    
     "localhost",
@@ -35,7 +38,7 @@ ALLOWED_HOSTS = [
     "prajna-kausalya-myportofolio.pws.cs.ui.ac.id",
 ]
 
-PRODUCTION = os.getenv('PRODUCTION', 'False').lower() == 'true'
+CSRF_TRUSTED_ORIGINS = ["https://prajna-kausalya-myportofolio.pws.cs.ui.ac.id"]
 
 
 # Application definition
@@ -47,6 +50,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'main',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -61,6 +66,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'portofolio.urls'
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 TEMPLATES = [
     {
