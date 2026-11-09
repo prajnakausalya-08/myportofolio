@@ -50,7 +50,7 @@
     </section>
 </main>
 
-{% if user.is_superuser or is_editor %}
+{% if user.is_superuser %}
     {% include "components/education_form_modal.html" %}
 {% endif %}
 
@@ -69,8 +69,6 @@ const educationGrid = document.getElementById("education-grid");
 const educationSearchForm = document.getElementById("education-search-form");
 const educationSearchInput = document.getElementById("education-search-input");
 const educationForm = document.getElementById("education-form");
-const educationEditModal = document.getElementById("edit-education-modal");
-const educationEditForm = document.getElementById("education-edit-modal-form");
 const SEARCH_DEBOUNCE_DELAY = 300;
 let educationSearchTimer;
 let educationAbortController;
@@ -105,20 +103,6 @@ function showEducationSection({ loading = false, error = false, empty = false, g
     educationGrid.classList.toggle("hide", !grid);
 }
 
-function getApiErrorMessage(result, status) {
-    if (status === 403) {
-        return "Anda tidak memiliki izin untuk melakukan tindakan ini.";
-    }
-
-    const messages = Object.entries(result || {})
-        .flatMap(([field, errors]) => {
-            const text = Array.isArray(errors) ? errors.join(" ") : String(errors);
-            return text ? [`${field}: ${text}`] : [];
-        });
-
-    return messages.join(" ") || `Terjadi kesalahan (status ${status}).`;
-}
-
 function buildEducationCard(item) {
     const education = item;
     const educationId = item.id;
@@ -127,6 +111,8 @@ function buildEducationCard(item) {
 
     const starUrl = STAR_ENDPOINT
         .replace("/0/", `/${educationId}/`);
+    const editUrl = "{% url 'main:edit_education' 0 %}"
+        .replace("/0/edit/", `/${educationId}/edit/`);
     const deleteUrl = DETAIL_ENDPOINT.replace("/0/", `/${educationId}/`);
     const starLabel = education.is_starred ? "Unstar" : "Star";
     const starTitle = education.star_count > 0
@@ -141,7 +127,7 @@ function buildEducationCard(item) {
         `
         : `<a href="{% url 'main:login' %}" class="button">Login untuk star (${escapeHtml(education.star_count)})</a>`;
     const editHtml = CAN_EDIT
-        ? `<button type="button" class="button" data-edit-id="${educationId}">Edit</button>`
+        ? `<a href="${editUrl}" class="button">Edit</a>`
         : "";
     const deleteHtml = IS_SUPERUSER
         ? `
@@ -165,10 +151,6 @@ function buildEducationCard(item) {
     if (deleteButton) {
         deleteButton.addEventListener("click", () => deleteEducation(deleteButton));
     }
-    const editButton = article.querySelector("[data-edit-id]");
-    if (editButton) {
-        editButton.addEventListener("click", () => openEducationEditModal(education));
-    }
 
     return article;
 }
@@ -181,14 +163,11 @@ async function deleteEducation(button) {
             method: "DELETE",
             headers: { "X-CSRFToken": getCookie("csrftoken"), Accept: "application/json" },
         });
-        if (!response.ok) {
-            const result = await response.json().catch(() => ({}));
-            throw new Error(getApiErrorMessage(result, response.status));
-        }
+        if (!response.ok) throw new Error(`Status ${response.status}`);
         showToast("Berhasil", "Education berhasil dihapus.", "success");
         await fetchEducations(educationSearchInput.value.trim());
     } catch (error) {
-        showToast("Gagal menghapus education", error.message, "error");
+        showToast("Gagal menghapus education", "Silakan coba lagi.", "error");
     } finally {
         button.disabled = false;
     }
@@ -204,14 +183,13 @@ async function toggleEducationStar(button) {
         });
 
         if (!response.ok) {
-            const result = await response.json().catch(() => ({}));
-            throw new Error(getApiErrorMessage(result, response.status));
+            throw new Error("Star request failed");
         }
 
         await fetchEducations(educationSearchInput.value.trim());
     } catch (error) {
         console.error("Error toggling education star:", error);
-        showToast("Gagal memperbarui star", error.message, "error");
+        showToast("Gagal memperbarui star", "Silakan coba lagi.", "error");
     } finally {
         button.disabled = false;
     }
@@ -266,7 +244,9 @@ async function addEducation(event) {
         const result = await response.json().catch(() => ({}));
 
         if (!response.ok) {
-            showToast("Gagal menambahkan education", getApiErrorMessage(result, response.status), "error");
+            const messages = Object.values(result).flat();
+            if (!messages.length) messages.push(`Terjadi kesalahan (status ${response.status}).`);
+            showToast("Gagal menambahkan education", messages.join(" "), "error");
             return;
         }
 
@@ -277,50 +257,6 @@ async function addEducation(event) {
     } catch (error) {
         console.error("Error adding education:", error);
         showToast("Gagal menambahkan education", "Tidak dapat terhubung ke server. Silakan coba lagi.", "error");
-    } finally {
-        submitButton.disabled = false;
-    }
-}
-
-function openEducationEditModal(education) {
-    if (!educationEditForm || !educationEditModal) return;
-
-    educationEditForm.dataset.detailUrl = DETAIL_ENDPOINT
-        .replace("/0/", `/${education.id}/`);
-    educationEditForm.elements.school.value = education.school;
-    educationEditForm.elements.start_year.value = education.start_year;
-    educationEditForm.elements.end_year.value = education.end_year;
-    educationEditForm.elements.curriculum.value = education.curriculum;
-    educationEditForm.elements.description.value = education.description;
-    educationEditModal.showPopover();
-}
-
-async function editEducation(event) {
-    event.preventDefault();
-    const submitButton = educationEditForm.querySelector('button[type="submit"]');
-    const formData = new FormData(educationEditForm);
-    const payload = Object.fromEntries(["school", "start_year", "end_year", "curriculum", "description"]
-        .map(field => [field, formData.get(field)]));
-    submitButton.disabled = true;
-
-    try {
-        const response = await fetch(educationEditForm.dataset.detailUrl, {
-            method: "PATCH",
-            headers: {
-                "X-CSRFToken": getCookie("csrftoken"),
-                "Content-Type": "application/json",
-                Accept: "application/json",
-            },
-            body: JSON.stringify(payload),
-        });
-        const result = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(getApiErrorMessage(result, response.status));
-
-        educationEditModal.hidePopover();
-        showToast("Berhasil", "Education berhasil diperbarui.", "success");
-        await fetchEducations(educationSearchInput.value.trim());
-    } catch (error) {
-        showToast("Gagal menyimpan education", error.message, "error");
     } finally {
         submitButton.disabled = false;
     }
@@ -342,9 +278,6 @@ educationSearchForm.addEventListener("submit", event => {
 
 if (educationForm) {
     educationForm.addEventListener("submit", addEducation);
-}
-if (educationEditForm) {
-    educationEditForm.addEventListener("submit", editEducation);
 }
 
 fetchEducations();

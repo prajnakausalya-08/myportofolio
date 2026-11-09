@@ -2,3 +2,132 @@ Nama: Prajna Kausalya Damdami
 NPM: 2506657213 
 Kelas: F 
 Status: Mahasiswa
+
+### Menjalankan proyek secara lokal
+
+Gunakan Python dan virtual environment, lalu jalankan `python -m pip install -r requirements.txt`.
+Salin `.env.example` menjadi `.env` dan isi `SECRET_KEY` dengan nilai acak yang unik.
+Kunci dapat dibuat dengan `python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"` setelah dependency terpasang. Jangan unggah `.env` atau membagikan nilainya.
+Jalankan `python manage.py migrate` dan `python manage.py runserver`. Untuk deployment, atur `SECRET_KEY` dan `PRODUCTION=True` pada environment server, bersama variabel database yang digunakan PWS. Mengganti kunci lama dapat membuat sesi login dan data bertanda tangan lama tidak berlaku.
+
+### Tugas 1
+
+1. Ya, saya menggunakan elemen semantik seperti `<header>`, `<main>`, `<section>`, `<article>`, dan `<footer>`. Elemen-elemen tersebut membantu saya untuk membagi halaman berdasarkan fungsinya sehingga struktur HTML lebih terorganisir dan mudah dipahami.
+
+2. menyesuaikan layout menurut saya cukup menantang karena harus menjaga agar rapih di ukuran layar yang berbeda. seperti pada desktop, bagian hobbies menggunakan tiga kolom , sedangkan pada mobile diubah menjadi satu kolom, pakai media query. jadi content punya ruang yang cukup dan lebih mudah dibaca pada layar yang kecil. Membuat tampilan responsive, saya. memprioristakan keterbacaan dan kerapihan layout agar tetap nyaman dibaca dari manapun. 
+
+3. Batasan yang saya rasakan adalah informasi pada website masih harus ditulis langsung di HTML, sehingga kurang praktis jika ingin memperbarui atau menambahkan data. Pada iterasi berikutnya, saya ingin menambahkan database dan Django MVT agar informasi portofolio dapat dikelola dan ditampilkan secara dinamis.
+
+### AI Disclosure Tugas 1
+
+Saya menggunakan ChatGPT sebagai alat bantu selama pengerjaan Tugas 1. Pada style.css, AI membantu memberikan alternatif kode untuk visual seperti shape, border, shadow, dan warna berdasarkan desain yang saya inginkan. Pada index.html, AI membantu saya memahami fungsi dan penggunaan elemen semantik seperti `<header>`, `<main>`, `<section>`, `<article>`, dan `<footer>`.
+
+Saya tetap menyesuaikan kode sesuai kebutuhan portofolio dan melakukan pengujian secara langsung pada browser. Ketika terdapat masalah pada styling Education yang tidak muncul pada browser, saya juga melakukan pengecekan terhadap file CSS dan HTML serta memverifikasi hasilnya pada browser.
+
+
+### Tugas 2
+
+1. Ketika pengguna membuka halaman `/education/`, browser mengirimkan request ke project Django. Request tersebut pertama kali diproses oleh `portofolio/urls.py`, kemudian diteruskan ke `main/urls.py` menggunakan `include("main.urls")`. Pada `main/urls.py`, URL `/education/` diarahkan ke view `show_education`.
+
+View `show_education` lalu mengambil data Education dari database melalui `Education.objects.all()`. Data tersebut dimasukkan ke dalam context dengan nama `education_list` dan dikirim ke template `education.html`. Template kemudian menggunakan Django Template Language untuk melakukan perulangan pada setiap data Education dan menampilkannya dalam bentuk kartu. Setelah template dirender menjadi HTML, response dikembalikan kepada browser sehingga data Education dapat dilihat oleh pengguna.
+
+2. Data Education sebaiknya disimpan di dalam model daripada ditulis langsung di template karena data menjadi lebih mudah dikelola dan diperbarui. Jika data ditulis langsung di HTML, setiap perubahan informasi seperti nama sekolah, tahun pendidikan, atau penambahan riwayat pendidikan harus dilakukan secara manual pada template. Jadi dengan menyimpan data di model, template hanya bertugas menampilkan data yang dikirim oleh view. Jika nantinya saya ingin menambahkan beberapa riwayat pendidikan, saya cukup menambahkan data baru tanpa harus membuat struktur HTML baru untuk setiap data. Hal ini membuat aplikasi lebih mudah dipelihara dan dikembangkan di masa depan.
+
+3. `makemigrations` digunakan untuk membuat file migration yang mencatat perubahan pada model, sedangkan `migrate` digunakan untuk menerapkan perubahan tersebut ke database. Contohnya pada Assignment 2, saya menambahkan model `Education` ke `main/models.py`. Setelah itu saya menjalankan `python manage.py makemigrations` untuk membuat file migration `0002_education.py`, kemudian menjalankan `python manage.py migrate` untuk menerapkan perubahan tersebut ke database.
+
+### AI Disclosure Tugas 2
+
+Saya menggunakan ChatGPT sebagai alat bantu selama pengerjaan Tugas 2. Karena Tugas 2 merupakan kelanjutan dari Tutorial 02, konsep Model-View-Template dan alur implementasinya sudah cukup familiar bagi saya. Oleh karena itu, bantuan AI lebih banyak saya gunakan untuk memastikan urutan pengerjaan dan ketika berhubungan dengan terminal serta Django shell.
+
+
+
+### Tugas 3
+
+1. Menurut saya, lebih enak menggunakan ModelForm karena kita tidak perlu membuat semua bagian form dari awal secara manual. ModelForm bisa langsung mengambil field yang ada di model Django dan menjadikannya sebagai field pada form. Jadi form yang dibuat juga lebih sesuai dengan data yang ada di database. Di Tugas 3 ini saya membuat `EducationForm` dari model `Education`, jadi field seperti `school`, `start_year`, `end_year`, `curriculum`, dan `description` bisa langsung digunakan di form. Selain itu, saya menambahkan `{% csrf_token %}` karena form saya digunakan untuk mengirim data dengan method POST. CSRF token ini digunakan Django untuk memastikan request yang masuk memang berasal dari form pada website kita dan bukan request palsu dari website lain. Jadi, token ini membantu mencegah orang lain mengirim request yang tidak seharusnya untuk mengubah data di website.
+
+2. Menurut saya JSON lebih enak digunakan untuk aplikasi web karena bentuknya lebih sederhana dan lebih ringkas dibandingkan XML. JSON juga cukup mudah dibaca, baik oleh manusia maupun program. Bentuk datanya juga menggunakan key dan value serta array yang sudah sering digunakan dalam bahasa pemrograman. JSON juga cocok digunakan untuk komunikasi antara backend dan frontend, terutama ketika data akan digunakan oleh JavaScript. Dibandingkan XML, JSON tidak membutuhkan banyak tag pembuka dan penutup sehingga data yang dikirim biasanya lebih singkat dan lebih mudah dibaca.
+
+3. Saat data portofolio ingin dikirim dalam bentuk JSON, pertama view mengambil data dari database. Pada bagian Education, saya mengambil semua data menggunakan `Education.objects.all()`. Setelah itu data tersebut diubah menjadi JSON menggunakan `serializers.serialize("json", educations)` dan dikembalikan menggunakan `HttpResponse` dengan `content_type="application/json"`.
+
+Setelah mendapatkan data JSON tersebut, pada `show_education` saya melakukan deserialize menggunakan `serializers.deserialize()`. Hasilnya kemudian diubah kembali menjadi object Django dan dimasukkan ke dalam `education_list` supaya bisa ditampilkan di `education.html`. Serialization diperlukan karena data yang berasal dari model Django tidak bisa langsung dikirim sebagai JSON. Data tersebut perlu diubah dulu ke format yang bisa dikirim melalui HTTP dan dibaca oleh aplikasi lain. Setelah itu, data JSON tersebut bisa di-deserialize lagi menjadi object Django ketika ingin digunakan kembali di halaman web.
+
+### AI Disclosure Tugas 3
+
+Saya menggunakan ChatGPT selama mengerjakan Tugas 3, terutama ketika ada bagian yang belum saya mengerti atau ketika saya bingung harus mulai dari mana. Saya menggunakan AI untuk memahami requirement tugas, memahami cara kerja ModelForm, membuat form create dan update, delete data, JSON, serialization, dan deserialization. Saya juga beberapa kali memberikan kode saya ke AI ketika ada error atau ketika saya ingin memastikan apakah cara yang saya buat sudah sesuai dengan requirement tugas.
+
+Biasanya saya memberikan kode yang sedang saya kerjakan dan menjelaskan bagian mana yang membuat saya bingung. Setelah itu saya meminta AI menjelaskan langkahnya satu per satu. Saya lebih sering menggunakan AI untuk memahami kenapa sesuatu harus dibuat seperti itu, bukan hanya meminta kode jadi. Pada Tugas 3 ini saya memilih bagian Education untuk dibuat menggunakan ModelForm dan data delivery. Saya membuat `EducationForm`, lalu membuat fitur untuk menambah, mengedit, dan menghapus data Education. Saya juga membuat endpoint JSON dan menggunakan deserialize supaya data JSON tersebut bisa digunakan lagi untuk menampilkan data di halaman Education.
+
+Selain Education, saya juga mengembangkan bagian Experience supaya memiliki fitur tambah, edit, hapus, dan JSON. Saat mengerjakan bagian ini, saya beberapa kali menyesuaikan kode yang diberikan karena struktur model dan tampilan Experience saya berbeda dengan contoh pada tutorial. Ada beberapa bagian yang ternyata tidak bisa langsung saya gunakan dari saran AI. Contohnya pada tampilan tombol Edit dan Hapus di Experience, hasil awalnya terlalu lebar dan kurang rapi. Saya kemudian mengecek CSS dan menyesuaikan sendiri bagian `flex` dan ukuran tombol sampai tampilannya lebih sesuai dengan halaman Education. Saya juga sempat membuka endpoint JSON Experience dan menemukan bahwa URL JSON-nya belum terdaftar di `urls.py`, lalu saya menambahkan route tersebut. Setelah semua fitur selesai, saya mengecek website melalui browser dan menjalankan `python manage.py test`. Pada pengujian terakhir terdapat 12 test dan semuanya berhasil dengan status `OK`. Jadi selama pengerjaan, saya menggunakan AI sebagai alat bantu untuk memahami materi, mencari tahu penyebab error, dan mengecek pekerjaan saya, tetapi saya tetap mencoba, menyesuaikan kode, dan melakukan testing sendiri.
+
+### Tugas 4
+Di Tugas 4 ini saya menambahkan authentication dan authorization menggunakan Django. Saya membuat fitur register, login, dan logout. Setelah user login, status login disimpan menggunakan session Django dan saya juga menggunakan cookie last_login untuk menyimpan waktu terakhir user login dan menampilkannya di halaman utama. Selain itu, saya juga menambahkan beberapa role supaya setiap user punya hak akses yang berbeda. Ada visitor, pengguna biasa, Editor, dan superuser.
+
+Visitor yang belum login masih bisa melihat data portfolio, tetapi harus login kalau ingin melakukan aksi yang membutuhkan akun. Pengguna biasa bisa melihat data dan memberikan atau membatalkan star pada Experience, tetapi tidak bisa menambah, mengedit, atau menghapus data. Editor punya hak seperti pengguna biasa, tetapi juga bisa mengedit data Education dan Experience. Editor tidak bisa menambah atau menghapus data. Superuser sebagai pemilik portfolio punya akses penuh, yaitu bisa menambah, mengedit, menghapus data, dan juga memberikan atau membatalkan star.
+
+Authorization:
+Untuk membuat role Editor, saya menggunakan Django Group melalui Django Admin. Saya membuat group bernama Editor lalu memasukkan user yang ingin dijadikan Editor ke dalam group tersebut. Pengecekan hak akses tidak hanya dilakukan di template. Saya juga melakukan pengecekan langsung di view supaya user tidak bisa melewati pembatasan hanya dengan mengetik URL secara manual. Untuk user yang belum login, halaman atau aksi yang membutuhkan login akan mengarahkan user ke halaman login. Sedangkan kalau user sudah login tetapi tidak punya hak untuk melakukan suatu aksi, maka server akan memberikan HTTP 403 Forbidden. Di template saya juga menyembunyikan tombol yang memang tidak boleh digunakan oleh user tersebut. Contohnya, tombol Tambah dan Hapus hanya muncul untuk superuser, sedangkan tombol Edit bisa muncul untuk superuser dan Editor.
+
+Fitur Star:
+Saya menambahkan fitur star pada model Experience menggunakan ManyToManyField yang terhubung dengan model User. Jadi setiap Experience bisa menyimpan user-user yang sudah memberikan star. Saya membuat view toggle_star untuk menangani star dan unstar. Fitur ini menggunakan method POST dan juga {% csrf_token %}. Kalau user belum memberikan star, maka user akan ditambahkan ke starred_by. Kalau sebelumnya sudah memberikan star, maka star tersebut akan dihapus. Jadi user bisa melakukan star dan unstar pada Experience yang sama. Di halaman Experience saya juga menampilkan jumlah star dan status star dari user yang sedang login. Karena menggunakan ManyToManyField, satu user tidak bisa tercatat berkali-kali pada Experience yang sama.
+
+JSON dan Data:
+Endpoint JSON dari Tugas 3 tetap saya pertahankan supaya masih bisa digunakan setelah penambahan authentication dan authorization. Saya juga memastikan data yang dikirim melalui endpoint JSON hanya data yang memang diperlukan untuk portfolio dan tidak mengirim data sensitif seperti password, session, atau informasi login user.
+
+Testing:
+Setelah semua fitur selesai, saya melakukan testing lewat browser untuk memastikan setiap role mendapatkan akses yang sesuai.Saya mencoba beberapa kondisi, seperti:
+
+visitor bisa melihat portfolio tetapi harus login untuk melakukan aksi tertentu, pengguna biasa bisa star dan unstar tetapi tidak bisa create, edit, atau delete, Editor bisa edit tetapi tidak bisa create atau delete, superuser bisa create, edit, delete, star, dan unstar, akses langsung ke URL yang tidak boleh diakses juga saya cek untuk memastikan server-side authorization tetap bekerja.
+
+Selain testing lewat browser, saya juga menjalankan automated test dengan python manage.py test. Pada testing terakhir ada 12 test dan semuanya berhasil dengan status OK.
+
+Saya juga menjalankan python manage.py check dan tidak ada masalah pada konfigurasi project.
+
+### AI Disclosure Tugas 4
+
+Saya menggunakan ChatGPT sebagai alat bantu selama mengerjakan Tugas 4. Saya biasanya menggunakan AI ketika ada bagian yang belum saya ngerti, bingung harus mulai dari mana, atau ingin mengecek apakah kode yang saya buat sudah sesuai dengan requirement tugas.
+
+Di awal pengerjaan, saya menggunakan AI untuk memahami pembagian hak akses antara visitor, pengguna biasa, Editor, dan superuser. Saya juga meminta AI menjelaskan secara bertahap cara menerapkan server-side authorization menggunakan login_required, PermissionDenied, is_superuser, dan Django Group. Saya juga menggunakan AI untuk bagian fitur star. Saya memberikan kode yang sudah saya buat dan meminta AI mengecek apakah penggunaan ManyToManyField, toggle_star, POST, dan {% csrf_token %} sudah sesuai dengan requirement. Selain itu, saya beberapa kali menggunakan AI ketika ada masalah di tampilan atau kode. Biasanya saya kirim bagian kode yang bermasalah lalu meminta AI menjelaskan penyebabnya dan memberikan beberapa kemungkinan solusinya. Setelah itu saya coba sendiri di project saya dan menyesuaikan kode yang diperlukan.
+
+Untuk bagian Editor, saya juga menggunakan AI untuk memahami cara kerja Django Group dan cara membedakan akses Editor dengan superuser. Setelah implementasinya selesai, saya tetap mengecek sendiri lewat Django Admin untuk memastikan user sudah masuk ke group Editor dan melakukan testing dengan user yang berbeda. Saya tidak selalu langsung memakai kode yang diberikan AI. Ada beberapa saran yang harus saya ubah karena struktur project saya berbeda dengan contoh atau tutorial. Jadi saya tetap perlu mencoba kodenya, melihat hasilnya di browser, lalu menyesuaikan sendiri bagian yang belum cocok.
+
+Contohnya, untuk tampilan tombol dan form saya beberapa kali harus menyesuaikan CSS sendiri karena hasil awal dari saran AI belum sesuai dengan tampilan website yang saya inginkan. Saya juga melakukan testing sendiri setelah perubahan supaya fitur yang sebelumnya sudah berjalan tidak ikut rusak.
+
+Contoh penggunaan AI:
+
+Beberapa contoh prompt yang saya gunakan selama mengerjakan Tugas 4:
+
+"Jelaskan secara jelas dan bertahap bagaimana authorization empat role ini bekerja."
+"Tolong cek kode ini apakah server-side check-nya sudah sesuai requirement."
+"Kenapa Editor boleh edit tapi tidak boleh create dan delete?"
+"Tolong cek implementasi toggle star ini apakah sudah sesuai requirement."
+"Saya kurang ngerti bagian ini, jelaskan kenapa harus dibuat seperti ini."
+"Tolong bantu cari penyebab error dari kode ini dan jelaskan langkah memperbaikinya."
+
+Saya lebih sering menggunakan AI untuk memahami konsep, mencari penyebab error, dan mengecek kode, bukan hanya untuk meminta kode jadi. Setelah mendapat penjelasan dari AI, saya tetap mencoba menjalankan dan memahami kodenya sendiri. Menurut saya, salah satu kekurangan AI selama pengerjaan adalah jawabannya tidak selalu langsung cocok dengan project saya. Karena struktur model, URL, template, dan CSS yang saya punya berbeda, beberapa kode dari AI perlu saya ubah lagi. Jadi saya tetap harus mengecek hasilnya sendiri dan menyesuaikan dengan project yang sedang saya kerjakan. Setelah semuanya selesai, saya melakukan testing lewat browser dan menjalankan automated test untuk memastikan fitur yang saya tambahkan berjalan dan fitur sebelumnya tetap aman.
+
+### Tugas 5
+
+1. Debouncing itu teknik buat nunda pemanggilan fungsi sampai user berhenti ngetik selama beberapa waktu. Menurut saya ini penting di pencarian AJAX karena kalau nggak pakai debouncing, setiap kali kita ngetik satu huruf bakal langsung ngirim request ke server. Misalnya kita mau cari "universitas", berarti bisa ada banyak request yang dikirim cuma karena kita ngetik satu-satu. Dengan debouncing, request baru dikirim setelah user berhenti ngetik beberapa saat, jadi request yang dikirim juga lebih sedikit dan pencariannya lebih efisien.
+
+2. `await` digunakan supaya program menunggu proses yang ada di `fetch()` selesai sebelum lanjut ke bagian berikutnya. Jadi misalnya kita pakai `await fetch()`, program akan menunggu sampai response dari server diterima dulu. Setelah itu baru response tersebut bisa diproses lagi menggunakan `response.json()`. Kalau nggak pakai `await`, hasil dari `fetch()` masih berupa Promise, jadi kode berikutnya bisa aja jalan duluan padahal datanya belum selesai diterima. Akibatnya data yang mau dipakai belum tersedia.
+
+3. XSS atau Cross-Site Scripting adalah serangan dimana seseorang memasukkan HTML atau JavaScript yang berbahaya ke dalam data yang nantinya ditampilkan di website. Hal ini perlu diperhatikan ketika menggunakan AJAX/JavaScript karena data dari server bisa kita masukkan langsung ke HTML. Kalau langsung pakai `innerHTML` tanpa melakukan escape, browser bisa menganggap isi tersebut sebagai HTML atau script dan menjalankannya. Sedangkan kalau menggunakan template Django, data yang ditampilkan biasanya sudah di-auto escape oleh Django. Karena itu di Tugas 5 saya melakukan escape pada data yang ditampilkan lewat JavaScript dan juga menggunakan `strip_tags` pada `EducationForm` supaya input yang masuk tidak mengandung tag HTML.
+
+### AI Disclosure Tugas 5
+
+Saya menggunakan ChatGPT sebagai alat bantu selama mengerjakan Tugas 5. Biasanya saya menggunakan AI kalau lagi bingung sama requirement tugas, nggak ngerti konsep tertentu, atau pas kode yang saya buat error dan saya nggak tau salahnya dimana.
+
+Di Tugas 5 ini saya beberapa kali menggunakan ChatGPT untuk memahami cara kerja AJAX dan Fetch API, terutama bagian mengambil data JSON, mengirim form menggunakan `fetch()`, membuat toast, debouncing untuk search, dan cara supaya data yang ditampilkan dari JavaScript aman dari XSS. Saya juga memberikan beberapa bagian kode project saya ke AI dan meminta dijelasin bagian tersebut secara bertahap karena saya lebih gampang ngerti kalau dijelasin dari kode yang saya punya sendiri.
+
+Contoh prompt yang saya gunakan misalnya seperti:
+
+- "jelasin ini secara bertahap karena aku masih bingung cara kerja fetch nya"
+- "kenapa search ajax harus pakai debounce?"
+- "tolong cek kode ini apakah udah sesuai requirement tugas 5"
+- "kenapa disini harus pakai await?"
+- "kalau data ini dimasukin ke innerHTML aman ga dari XSS?"
+- "tolong cari tau kenapa kode ini error tapi jelasin juga kenapa errornya"
+
+Saya nggak langsung menggunakan semua kode atau saran yang diberikan AI. Beberapa bagian harus saya ubah lagi karena struktur project saya beda dengan contoh yang dijelaskan di tutorial. Saya juga beberapa kali mencoba kodenya langsung di browser untuk lihat apakah hasilnya sesuai atau malah ada bagian yang rusak. Untuk fitur Education saya juga melakukan pengecekan dengan beberapa role yang berbeda supaya authorization yang sudah dibuat di tugas sebelumnya tetap berjalan.
+
+Menurut saya AI cukup membantu terutama kalau saya lagi stuck dan nggak tau harus mulai dari mana. Tapi AI juga nggak selalu langsung memberikan jawaban yang cocok dengan project saya. Ada beberapa kode yang harus disesuaikan lagi, terutama karena nama URL, template, model, dan struktur project saya sendiri. Jadi setelah mendapat bantuan dari AI saya tetap harus coba sendiri, baca lagi kodenya, dan testing sampai hasilnya sesuai.

@@ -1,4 +1,3 @@
-{% if user.is_superuser %}
 <div
     id="add-education-modal"
     class="project-form-modal"
@@ -48,73 +47,6 @@
                     Batal
                 </button>
                 <button type="submit" class="button">Tambah Education</button>
-            </div>
-        </form>
-    </div>
-</div>
-{% endif %}
-
-<div
-    id="edit-education-modal"
-    class="project-form-modal"
-    popover="auto"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="edit-education-modal-title"
->
-    <button
-        type="button"
-        class="project-form-modal__backdrop"
-        popovertarget="edit-education-modal"
-        popovertargetaction="hide"
-        aria-label="Tutup form edit education"
-    ></button>
-
-    <div class="project-form-modal__content">
-        <button
-            type="button"
-            class="project-form-modal__close"
-            popovertarget="edit-education-modal"
-            popovertargetaction="hide"
-            aria-label="Tutup form edit education"
-        >
-            ×
-        </button>
-
-        <h2 id="edit-education-modal-title">Edit Education</h2>
-
-        <form id="education-edit-modal-form" class="project-form">
-            <div class="form-group">
-                <label for="edit-education-school">Nama Sekolah</label>
-                <input id="edit-education-school" name="school" maxlength="255" required>
-            </div>
-            <div class="form-group">
-                <label for="edit-education-start-year">Tahun Mulai</label>
-                <input id="edit-education-start-year" name="start_year" type="number" required>
-            </div>
-            <div class="form-group">
-                <label for="edit-education-end-year">Tahun Selesai</label>
-                <input id="edit-education-end-year" name="end_year" type="number" required>
-            </div>
-            <div class="form-group">
-                <label for="edit-education-curriculum">Kurikulum</label>
-                <input id="edit-education-curriculum" name="curriculum" maxlength="255" required>
-            </div>
-            <div class="form-group">
-                <label for="edit-education-description">Deskripsi</label>
-                <textarea id="edit-education-description" name="description" rows="3" required></textarea>
-            </div>
-
-            <div class="project-form-modal__actions">
-                <button
-                    type="button"
-                    class="button button-secondary"
-                    popovertarget="edit-education-modal"
-                    popovertargetaction="hide"
-                >
-                    Batal
-                </button>
-                <button type="submit" class="button">Simpan Perubahan</button>
             </div>
         </form>
     </div>
