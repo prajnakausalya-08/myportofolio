@@ -35,10 +35,29 @@ class EducationAPITest(APITestCase):
         for user in (None, self.user):
             self.client.force_authenticate(user=user)
             self.assertEqual(self.client.post(self.list_url, self.payload, format="json").status_code, 403)
+            self.assertEqual(self.client.put(self.detail_url, self.payload, format="json").status_code, 403)
             self.assertEqual(self.client.patch(self.detail_url, {"school": "Changed"}, format="json").status_code, 403)
             self.assertEqual(self.client.delete(self.detail_url).status_code, 403)
         self.education.refresh_from_db()
+        self.assertEqual(Education.objects.count(), 1)
         self.assertEqual(self.education.school, "Universitas Indonesia")
+
+    def test_each_role_can_read_and_rejected_requests_do_not_change_data(self):
+        for user in (None, self.user, self.editor, self.owner):
+            self.client.force_authenticate(user=user)
+            self.assertEqual(self.client.get(self.list_url).status_code, 200)
+            self.assertEqual(self.client.get(self.detail_url).status_code, 200)
+
+        self.client.force_authenticate(user=self.user)
+        original_school = self.education.school
+        original_count = Education.objects.count()
+        self.assertEqual(self.client.post(self.list_url, self.payload, format="json").status_code, 403)
+        self.assertEqual(self.client.put(self.detail_url, self.payload, format="json").status_code, 403)
+        self.assertEqual(self.client.patch(self.detail_url, {"school": "Changed"}, format="json").status_code, 403)
+        self.assertEqual(self.client.delete(self.detail_url).status_code, 403)
+        self.education.refresh_from_db()
+        self.assertEqual(Education.objects.count(), original_count)
+        self.assertEqual(self.education.school, original_school)
 
     def test_editor_can_update_but_not_create_or_delete(self):
         self.client.force_authenticate(user=self.editor)
@@ -77,6 +96,17 @@ class EducationAPITest(APITestCase):
         self.assertEqual(response.data["star_count"], 1)
         self.assertEqual(response.data["starred_by_names"], "student")
         response = self.client.post(self.star_url)
+        self.assertFalse(response.data["is_starred"])
+        self.assertEqual(response.data["star_count"], 0)
+
+    def test_owner_can_star_and_unstar(self):
+        self.client.force_authenticate(user=self.owner)
+        response = self.client.post(self.star_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.data["is_starred"])
+        self.assertEqual(response.data["star_count"], 1)
+        response = self.client.post(self.star_url)
+        self.assertEqual(response.status_code, 200)
         self.assertFalse(response.data["is_starred"])
         self.assertEqual(response.data["star_count"], 0)
 
@@ -123,7 +153,9 @@ class EducationAPITest(APITestCase):
         self.client.force_authenticate(user=self.owner)
         for payload, field in (({**self.payload, "start_year": "abc"}, "start_year"),
                                ({**self.payload, "end_year": ""}, "end_year"),
-                               ({**self.payload, "school": ""}, "school")):
+                               ({**self.payload, "school": ""}, "school"),
+                               ({**self.payload, "curriculum": "<img src=x>"}, "curriculum"),
+                               ({**self.payload, "description": "<script></script>"}, "description")):
             response = self.client.post(self.list_url, payload, format="json")
             self.assertEqual(response.status_code, 400)
             self.assertIn(field, response.data)
@@ -138,6 +170,19 @@ class EducationAPITest(APITestCase):
         self.assertEqual(self.education.school, "Updated")
         self.assertEqual(self.education.description, "Text")
         self.assertEqual(self.education.start_year, 2025)
+
+    def test_post_strips_html_from_all_text_fields(self):
+        self.client.force_authenticate(user=self.owner)
+        response = self.client.post(self.list_url, {
+            **self.payload,
+            "school": "<b>SMA</b>",
+            "curriculum": "<i>Merdeka</i>",
+            "description": "Belajar <script>alert(1)</script> aman",
+        }, format="json")
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data["school"], "SMA")
+        self.assertEqual(response.data["curriculum"], "Merdeka")
+        self.assertEqual(response.data["description"], "Belajar alert(1) aman")
 
     def test_wrong_methods_and_missing_star(self):
         self.client.force_authenticate(user=self.owner)
@@ -176,3 +221,14 @@ class EducationAPITest(APITestCase):
         self.assertEqual(page.status_code, 200)
         self.assertContains(page, self.detail_url)
         self.assertContains(page, 'method: "PATCH"')
+
+    def test_education_page_exposes_edit_modal_only_to_editor_or_owner(self):
+        self.client.force_login(self.user)
+        page = self.client.get(reverse("main:show_education"))
+        self.assertNotContains(page, 'id="edit-education-modal"')
+
+        self.client.force_login(self.editor)
+        page = self.client.get(reverse("main:show_education"))
+        self.assertContains(page, 'id="edit-education-modal"')
+        self.assertContains(page, 'method: "PATCH"')
+        self.assertNotContains(page, 'id="add-education-modal"')

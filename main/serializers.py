@@ -11,9 +11,23 @@ class EducationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Education
-        fields = ("id", "school", "start_year", "end_year", "curriculum",
-                  "description", "star_count", "is_starred", "starred_by_names")
-        read_only_fields = ("id",)
+        fields = (
+            "id",
+            "school",
+            "start_year",
+            "end_year",
+            "curriculum",
+            "description",
+            "star_count",
+            "is_starred",
+            "starred_by_names",
+        )
+        read_only_fields = (
+            "id",
+            "star_count",
+            "is_starred",
+            "starred_by_names",
+        )
 
     def validate_school(self, value):
         value = strip_tags(value).strip()
@@ -22,13 +36,19 @@ class EducationSerializer(serializers.ModelSerializer):
         return value
 
     def validate_curriculum(self, value):
-        return strip_tags(value).strip()
+        value = strip_tags(value).strip()
+        if not value:
+            raise serializers.ValidationError("Kurikulum tidak boleh kosong.")
+        return value
 
     def validate_description(self, value):
-        return strip_tags(value).strip()
+        value = strip_tags(value).strip()
+        if not value:
+            raise serializers.ValidationError("Deskripsi tidak boleh kosong.")
+        return value
 
     def get_star_count(self, obj):
-        return len(obj.starred_by.all())
+        return obj.starred_by.count()
 
     def get_is_starred(self, obj):
         request = self.context.get("request")
